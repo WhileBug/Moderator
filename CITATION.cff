@@ -1,0 +1,18 @@
+cff-version: 1.1.0
+message: "If you use this software, please cite it as below."
+authors:
+- family-names: Wang
+  given-names: Peiran
+- family-names: Li
+  given-names: Qiyu
+- family-names: Yu
+  given-names: Longxuan
+- family-names: Wang
+  given-names: Ziyao
+- family-names: Li
+  given-names: Ang
+- family-names: Jin
+  given-names: Haojian
+title: Moderator: Moderating Text-to-Image Diffusion Models through Fine-grained Context-based Policies
+version: v1.2.0
+date-released: 2024-07-18
