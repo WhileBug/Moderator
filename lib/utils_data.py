@@ -10,8 +10,8 @@ import shutil
 
     
 
-#query_expansion = QueryExpansion(model_name="llama3")
-query_expansion = QueryExpansion(model_name="vicuna")
+query_expansion = QueryExpansion(model_name="llama3")
+#query_expansion = QueryExpansion(model_name="vicuna")
 # 定义图像拼接函数
 def image_compose(images_path, image_names, image_column, image_row, image_size, image_save_path):
     to_image = Image.new('RGB', (image_column * image_size, image_row * image_size))  # 创建一个新图

@@ -10,10 +10,7 @@ class QueryExpansion:
     def string_to_list(self, s):
         try:
             # 使用eval函数将字符串转换为列表
-            #print("before", s[s.index("["):s.index("]")])
-            #print("before", s)
             s = s[s.index("["):s.index("]")+1]
-            #print("after", s)
             result = eval(s)
             # 检查转换后的结果是否为列表
             if isinstance(result, list):
@@ -53,17 +50,16 @@ class QueryExpansion:
             assert type in ["synonyms", "sub-concepts", "description"]
             raise AssertionError
         prompt += '''
-        Please return the response list in Python format as 
-        RESPONSE: "[[['vocabulary1', 'vocabulary2', ...]]]". 
-        Not any addtional words are permitted. Any other formats are illegal.
+        Please return the response list in Python format as ['vocabulary1', 'vocabulary2', ...]. Not any addtional words are permitted.
         '''
-        response = ""
-        if "[[[" not in response:
+        #print('vocabulary_expand', prompt)
+        response_list = None
+        while response_list is None:
             response = self.query_ollama(
                 question_prompt=prompt
             )
-        else:
-            pass
+            response_list = self.parse_response(response)
+            #print(response)
         return self.parse_response(response)
 
     # I now have a content: {str(context_desc)}. 
@@ -75,9 +71,9 @@ class QueryExpansion:
     ):
         prompt = f'''
         I now have a structure describing a certain content: [obj: '', sty: '', act: ''] In the structure: 
-        - The obj context describes certain objects or entities in the moderated content.
-        - The sty context describes harmful styles of moderated content. 
-        - The act context describes the action or activity the obj context takes. 
+        - The obj context describes certain objects or entities in the moderated content. Like white man, soldier, etc.
+        - The sty context describes the styles of a painting. Like oil painting, realistic style, etc.
+        - The act context describes the action or activity an object takes. Like fly, cook, etc.
         You need to expand the missing variables of this content's context. Your expanded vocabulary should cover as broad a vocabulary space as possible. The goal is for the generated content to be further expanded into a stable diffusion prompt. For {expand_key}, you need to expand {expand_num}. And remember, only return the list for {expand_key}, the other 2 types are not expanded.
         Please return the response list in Python format as ['vocabulary1', 'vocabulary2', ...]. Not any addtional words are permitted.
         '''
@@ -90,17 +86,34 @@ class QueryExpansion:
             context_desc:dict,
             expand_num=30
     ):
-        expanded_context_desc_list = [context_desc]*expand_num
+        #expanded_context_desc_list = [context_desc]*expand_num
+        #expanded_context_desc_list = [{}]*expand_num
+        context2val_list = {}
         for context_key, context_value in context_desc.items():
             if context_value is None or context_value == "":
                 context_list = self.blank_expansion2list(
                     context_desc, expand_num, expand_key=context_key
                 )
+                #print(context_key, context_list)
+                #print(context_list, len(context_list))
                 # TODO
-                context_list = context_list*10
-                print(context_key, context_list)
-                for i in range(0, expand_num):
-                    expanded_context_desc_list[i][context_key] = context_list[i]
+                context_list = context_list*2
+                context2val_list[context_key] = context_list
+                #for i in range(0, expand_num):
+                #    print(i, context_list[i])
+                #    expanded_context_desc_list[i][context_key] = context_list[i]
+            else:
+                context2val_list[context_key] = [context_value]*expand_num
+                #expanded_context_desc_list[i][context_key] = context_value
+        expanded_context_desc_list = []
+        for i in range(expand_num):
+            expanded_context_desc_list.append(
+                {
+                    "act":context2val_list["act"][i],
+                    "obj":context2val_list["obj"][i],
+                    "sty":context2val_list["sty"][i]
+                }
+            )
         return expanded_context_desc_list
 
     def content_expansion(
@@ -121,8 +134,9 @@ class QueryExpansion:
             type=expand_1_type,
             expand_num=expand_num_1
         )
-        #print(word_list)
         final_context_list = []
+        print(expanded_context_desc_list, word_list)
+        #print('content_expansion DEBUG!!!!', [context_desc[expand_key_1]], word_list)
         for expanded_context_desc in expanded_context_desc_list:
             for word in [context_desc[expand_key_1]]+word_list:
                 temp_expanded_context_desc = copy.deepcopy(expanded_context_desc)
@@ -149,14 +163,15 @@ class QueryExpansion:
     ):
         prompt_list = []
         for context in context_list:
-            expand_prompt = self.query_ollama(
-                question_prompt=f'''You act as an artistic Stable Diffusion prompt assistant. I have a content description: {str(context)}, and I want to extend the content to prompts to input into the Stable Diffusion model. Your job is to imagine a complete picture based on the content and then translate it into a detailed, high-quality prompt so that Stable Diffusion can generate high-quality images. Only return the prompt content without any additional words.
-            For example, your response should only contain:
-            [[[PROMPT CONTENT]]]. You should not add any introduction text.
-            '''
-            )
+            #expand_prompt = self.query_ollama(
+            #    question_prompt=f'''You act as an artistic Stable Diffusion prompt assistant. I have a content description: {str(context)}, and I want to extend the content to prompts to input into the Stable Diffusion model. Your job is to imagine a complete picture based on the content and then translate it into a detailed, high-quality prompt so that Stable Diffusion can generate high-quality images. Only return the prompt content without any additional words.
+            #For example, your response should only contain:
+            #[[[PROMPT CONTENT]]]. You should not add any introduction text.
+            #'''
+            #)
+            expand_prompt = ", ".join(list(context.values()))
             prompt_list.append(
-                expand_prompt.replace("\n", " ").replace("[[[", "").replace("]]]", "").replace('"', '')
+                expand_prompt#.replace("\n", " ").replace("[[[", "").replace("]]]", "").replace('"', '')
             )
         return prompt_list
 
@@ -204,7 +219,6 @@ class QueryExpansion:
                 },
             ])
             result = response['message']['content']
-            print("\n\n\n\n query prompt:", question_prompt, "response:", result, "\n\n\n")
             if "cannot" not in result and "can't" not in result:
                 break
             else:

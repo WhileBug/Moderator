@@ -25,10 +25,10 @@ class conceptPermissionConfig:
         #self.finetuned_models_dir=self.work_dir+"/LLMEthicsPatches/files/models_finetune/"
         #self.edited_models_dir=self.work_dir+"/LLMEthicsPatches/files/models_edited/"
         #self.task_vectors_dir=self.work_dir+"/LLMEthicsPatches/files/task_vectors/"      
-        self.data_dir=self.work_dir+"/ConceptPermission/data"
-        self.finetuned_models_dir=self.work_dir+"/ConceptPermission/files/models_finetune/"
-        self.edited_models_dir=self.work_dir+"/ConceptPermission/files/models_edited/"
-        self.task_vectors_dir=self.work_dir+"/ConceptPermission/files/task_vectors/"
+        self.data_dir=self.work_dir+"/Moderator/data"
+        self.finetuned_models_dir=self.work_dir+"/Moderator/files/models_finetune/"
+        self.edited_models_dir=self.work_dir+"/Moderator/files/models_edited/"
+        self.task_vectors_dir=self.work_dir+"/Moderator/files/task_vectors/"
 
 class ModeratorPolicyManager:
     def __init__(self):
