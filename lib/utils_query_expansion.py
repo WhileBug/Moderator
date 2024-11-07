@@ -1,5 +1,8 @@
 import ollama
 import copy
+
+BLANK_FLAG = False
+
 class QueryExpansion:
     def __init__(
         self,
@@ -94,33 +97,36 @@ class QueryExpansion:
     ):
         #expanded_context_desc_list = [context_desc]*expand_num
         #expanded_context_desc_list = [{}]*expand_num
-        context2val_list = {}
-        for context_key, context_value in context_desc.items():
-            if context_value is None or context_value == "":
-                context_list = self.blank_expansion2list(
-                    context_desc, expand_num, expand_key=context_key
+        if BLANK_FLAG:
+            context2val_list = {}
+            for context_key, context_value in context_desc.items():
+                if context_value is None or context_value == "":
+                    context_list = self.blank_expansion2list(
+                        context_desc, expand_num, expand_key=context_key
+                    )
+                    #print(context_key, context_list)
+                    #print(context_list, len(context_list))
+                    # TODO
+                    context_list = context_list*2
+                    context2val_list[context_key] = context_list
+                    #for i in range(0, expand_num):
+                    #    print(i, context_list[i])
+                    #    expanded_context_desc_list[i][context_key] = context_list[i]
+                else:
+                    context2val_list[context_key] = [context_value]*expand_num
+                    #expanded_context_desc_list[i][context_key] = context_value
+            expanded_context_desc_list = []
+            for i in range(expand_num):
+                expanded_context_desc_list.append(
+                    {
+                        "act":context2val_list["act"][i],
+                        "obj":context2val_list["obj"][i],
+                        "sty":context2val_list["sty"][i]
+                    }
                 )
-                #print(context_key, context_list)
-                #print(context_list, len(context_list))
-                # TODO
-                context_list = context_list*2
-                context2val_list[context_key] = context_list
-                #for i in range(0, expand_num):
-                #    print(i, context_list[i])
-                #    expanded_context_desc_list[i][context_key] = context_list[i]
-            else:
-                context2val_list[context_key] = [context_value]*expand_num
-                #expanded_context_desc_list[i][context_key] = context_value
-        expanded_context_desc_list = []
-        for i in range(expand_num):
-            expanded_context_desc_list.append(
-                {
-                    "act":context2val_list["act"][i],
-                    "obj":context2val_list["obj"][i],
-                    "sty":context2val_list["sty"][i]
-                }
-            )
-        return expanded_context_desc_list
+            return expanded_context_desc_list
+        else:
+            return [context_desc]*expand_num
 
     def content_expansion(
         self,

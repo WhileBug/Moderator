@@ -59,7 +59,7 @@ class ModeratorPolicyManager:
             expand_type,
             expand_key
     ):
-        content_name = real_content_dict["obj"].replace(" ", "_")+"-"+real_content_dict["sty"].replace(" ", "_")+"-"+real_content_dict["act"].replace(" ", "_")
+        content_name = "label-"+label_content_dict["obj"].replace(" ", "_")+"-"+label_content_dict["sty"].replace(" ", "_")+"-"+label_content_dict["act"]+"-real-"+real_content_dict["obj"].replace(" ", "_")+"-"+real_content_dict["sty"].replace(" ", "_")+"-"+real_content_dict["act"].replace(" ", "_")
         task_vector_dict = {
             "input_data_init": 0,
             "input_num": 100,
@@ -85,6 +85,46 @@ class ModeratorPolicyManager:
         }
         return task_vector_dict
 
+    def remove_finegrained(self, policy_dict):
+        task_vector_list = []
+        remove_task_vector = self.single_task_vector_parse(
+            label_content_dict=policy_dict["src_content"],
+            real_content_dict=policy_dict["src_content"],
+            content_operator = "-",
+            expand_type = policy_dict["expand_type"],
+            expand_key = policy_dict["expand_context"]
+        )
+        task_vector_list.append(remove_task_vector)
+        
+        valid_src_context_num = 0
+        for context_key in policy_dict["src_content"]:
+            if policy_dict["src_content"][context_key]!="":
+                valid_src_context_num += 1
+            else:
+                ...
+
+        if valid_src_context_num==1:
+            ...
+        else:
+            finegrained_content = {}
+            exist_context_key = ""
+            for context_key in policy_dict["src_content"]:
+                if policy_dict["expand_context"]==context_key:
+                    finegrained_content[context_key]=""
+                else:
+                    finegrained_content[context_key]=policy_dict["src_content"][context_key]
+                    if policy_dict["src_content"][context_key]!="" and policy_dict["src_content"][context_key] is not None:
+                        exist_context_key=context_key
+            finegrained_task_vector = self.single_task_vector_parse(
+                label_content_dict=policy_dict["src_content"],
+                real_content_dict=finegrained_content,#policy_dict["src_content"],
+                content_operator = "-",
+                expand_type = policy_dict["expand_type"],
+                expand_key = exist_context_key#policy_dict["expand_context"]
+            )
+            task_vector_list.append(finegrained_task_vector)
+        return task_vector_list
+    
     def policy_parse_to_yaml(self, policy_dict):
         yaml_dict = {
             "task_vector_applied": 0,
@@ -94,14 +134,16 @@ class ModeratorPolicyManager:
         }
         print(policy_dict)
         if policy_dict["method"]=="remove":
-            remove_task_vector = self.single_task_vector_parse(
-                label_content_dict=policy_dict["src_content"],
-                real_content_dict=policy_dict["src_content"],
-                content_operator = "-",
-                expand_type = policy_dict["expand_type"],
-                expand_key = policy_dict["expand_context"]
-            )
-            yaml_dict["task_vectors"].append(remove_task_vector)
+            task_vector_list = self.remove_finegrained(policy_dict)
+            yaml_dict["task_vectors"]=task_vector_list
+            #remove_task_vector = self.single_task_vector_parse(
+            #    label_content_dict=policy_dict["src_content"],
+            #    real_content_dict=policy_dict["src_content"],
+            #    content_operator = "-",
+            #    expand_type = policy_dict["expand_type"],
+            #    expand_key = policy_dict["expand_context"]
+            #)
+            #yaml_dict["task_vectors"].append(remove_task_vector)
         elif policy_dict["method"]=="replace":
             src_task_vector = self.single_task_vector_parse(
                 label_content_dict=policy_dict["src_content"],
@@ -111,8 +153,8 @@ class ModeratorPolicyManager:
                 expand_key=policy_dict["expand_context"]
             )
             dst_task_vector = self.single_task_vector_parse(
-                label_content_dict=policy_dict["dst_content"],
-                real_content_dict=policy_dict["src_content"],
+                label_content_dict=policy_dict["src_content"],
+                real_content_dict=policy_dict["dst_content"],
                 content_operator="+",
                 expand_type=policy_dict["expand_type"],
                 expand_key=policy_dict["expand_context"]

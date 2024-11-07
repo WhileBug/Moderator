@@ -6,8 +6,9 @@
 
 ```shell
 cd Moderator
-conda env create --prefix moderator --file moderator.yaml
+conda create --prefix ./moderator python=3.9
 conda activate moderator
+pip install -r requirements.txt
 ```
 
 Install diffuser module from GitHub.
@@ -35,6 +36,7 @@ export ModeratorWordDir="Input your work dir, the original dir for the clone."
 ### 2-1-Run the test
 First run the command below to start the backend
 ```shell
+#featurize port export 7417
 python main_backend.py
 ```
 This will start a backend on flask on http://127.0.0.1:7417/
