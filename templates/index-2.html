@@ -7,80 +7,193 @@
     <title>Content Moderation Tool</title>
     <link href="https://stackpath.bootstrapcdn.com/bootstrap/4.5.2/css/bootstrap.min.css" rel="stylesheet">
     <style>
-        h4 {
-            color: black
-        }
         body {
-            font-family: Arial, sans-serif;
-            background-color: #F0F0F0;
-        }
-        .panel {
-            padding: 20px;
-            color: black;
-            border-radius: 5px;
-            margin-bottom: 20px;
-        }
-        .example-section {
-            padding: 20px;
-            color: white;
-            border-radius: 5px;
-            width: 100%;
-        }
-        .policy-list {
-            overflow-y: auto;
-            max-height: 500px;
-            padding: 10px;
-            border-radius: 5px;
-        }
-        .policy-list .form-check {
-            color: white;
-        }
-        .example-images img {
-            width: 100%;
-            height: auto;
-            object-fit: cover;
-            border-radius: 5px;
-        }
-        .form-control, .form-check-input, .btn {
-            border-radius: 5px;
-        }
+    font-family: 'Roboto', sans-serif;
+    background-color: #F9F9F9;
+}
+
+h4 {
+    color: #2D2D2D;
+    font-weight: 700;
+}
+
+.panel {
+    padding: 20px;
+    background-color: white;
+    border-radius: 12px;
+    box-shadow: 0px 4px 16px rgba(0, 0, 0, 0.08);
+    margin-bottom: 20px;
+}
+
+.btn {
+    border-radius: 30px;
+    font-weight: 600;
+    background: linear-gradient(90deg, #72C3E4, #4FA3D8);
+    color: white;
+    transition: background 0.3s ease-in-out;
+}
+
+.btn:hover {
+    background: linear-gradient(90deg, #4FA3D8, #72C3E4);
+}
+
+.form-control, .form-check-input {
+    border-radius: 8px;
+    border: 1px solid #CED4DA;
+    box-shadow: none;
+    transition: border-color 0.3s;
+}
+
+.form-control:focus {
+    border-color: #4FA3D8;
+    box-shadow: 0 0 0 0.2rem rgba(73, 169, 216, 0.25);
+}
+
+.policy-list {
+    padding: 10px;
+    border: 1px solid #ddd;
+    margin-bottom: 10px;
+    border-radius: 5px;
+    background-color: #fff;
+}
+
+.policy-list .form-check {
+    margin-bottom: 10px;
+    padding: 10px;
+    border-bottom: 1px solid #eaeaea;
+}
+
+.form-check-input {
+    margin-right: 10px;
+}
+
+.btn-group {
+    margin-left: 10px;
+}
+
+
+
+.example-images img {
+    width: 50%;
+    height: auto;
+    object-fit: cover;
+    border-radius: 12px;
+    box-shadow: 0px 4px 12px rgba(0, 0, 0, 0.1);
+}
+
+textarea.form-control {
+    resize: none;
+    background-color: #F2F2F2;
+    border-radius: 10px;
+    padding: 12px;
+    font-size: 14px;
+}
+
+.slider-container {
+    width: 100%;
+    max-width: 100%;
+    margin: 0 auto;
+    background-color: #F2F2F2;
+    padding: 10px;
+    border-radius: 12px;
+    box-shadow: 0px 4px 8px rgba(0, 0, 0, 0.05);
+}
+
+input[type=range] {
+    -webkit-appearance: none;
+    width: 100%;
+    height: 8px;
+    background: #ddd;
+    outline: none;
+    opacity: 0.8;
+    transition: opacity 0.2s;
+}
+
+input[type=range]:hover {
+    opacity: 1;
+}
+
+input[type=range]::-webkit-slider-thumb {
+    -webkit-appearance: none;
+    appearance: none;
+    width: 18px;
+    height: 18px;
+    border-radius: 50%;
+    background: #4CAF50;
+    cursor: pointer;
+    transition: background-color 0.3s ease;
+}
+
+input[type=range]::-webkit-slider-thumb:hover {
+    background-color: #3A9244;
+}
+
+.progress {
+    height: 10px;
+    background-color: #E0E0E0;
+    border-radius: 5px;
+    overflow: hidden;
+}
+
+.progress-bar {
+    height: 100%;
+    background-color: #4CAF50;
+    transition: width 0.1s;
+}
+
     </style>
 </head>
 
 <body>
     <div class="container-fluid">
         <div class="row">
-            <div class="col-3" style="background-color: white; min-height: 100vh;">
+            <div class="col-4" style="background-color: white; min-height: 100vh;">
                 <div class="panel">
                         <h4>Manage Policies</h4>
                         <!--<div class="form-group">
                             <input type="text" class="form-control" placeholder="Enter keyword">
                         </div>
                         -->
-                        <button class="btn btn-light btn-block" id="add-policy-button" onclick="addPolicy()" style="background-color:lightblue">Add Policy</button>
-                        <button class="btn btn-light btn-block" id="add-policy-button" onclick="addPolicy()" style="background-color:lightblue">Activate Chosen Policies</button>
+                        <button class="btn btn-success btn-block" id="add-policy-button" onclick="addPolicy()">Add Policy</button>
+                        <button class="btn btn-info btn-block" id="activate-policy-button" onclick="activatePolicies()">Activate Chosen Policies</button>
+                        
+
                     </div>
                 <hr>
                 <div class="panel">
                         <h4>Policy List</h4>
+
+                        <div class="form-group">
+                            <input type="text" class="form-control" placeholder="Keyword" style="width: 100px; display: inline-block;">
+                            <select class="form-control" style="width: 120px; display: inline-block;">
+                                <option value="method">Method</option>
+                            </select>
+                            <select class="form-control" style="width: 120px; display: inline-block;">
+                                <option value="harm">Harm</option>
+                            </select>
+                            <button class="btn btn-primary" style="margin-left: 10px;">Search Policies</button>
+                            <button class="btn btn-secondary" style="margin-left: 10px;">Clear</button>
+                        </div>
+                        
+
                         <hr>
                         <div class="policy-list" id="policy-list">
                             <!-- Policy items will be dynamically added here -->
                         </div>
                     </div>
             </div>
-            <div class="col-9" style="background-color:#FEF7EC">
+            <div class="col-8" style="background-color:#FEF7EC">
                 <div class="row">
                     <div class="col-md-6">
-                        <div class="panel" style="border-radius: 10%; background-color: #F5F5F5; height:511px;">
-                            <h4>Enter Example Prompt</h4>
-                            <textarea class="form-control" id="example-prompt" rows="15.5"></textarea>
+                        <div class="panel" style="border-radius: 10%; background-color: #F5F5F5; height:400px;">
+                            <h4>Test Prompt</h4>
+                            <textarea class="form-control" id="example-prompt" rows="12.5"></textarea>
                             <button class="btn btn-light btn-block mt-2" onclick="generateImage()" style="background-color:#FFDAB9">Generate Image</button>
                         </div>
                     </div>
 
                     <div class="col-md-6">
-                        <div class="panel"  style="border-radius: 10%; background-color: #F5F5F5;">
+                        <div class="panel"  style="border-radius: 10%; background-color: #F5F5F5;font-size: large;">
                             <h4>Moderation Policy</h4>
                             <div class="form-group">
                                 <!--<label for="policy_name">Policy Name:</label>-->
@@ -95,41 +208,75 @@
                             </div>
 
                             <div class="form-row">
-                                <div class="form-group col-md-6">
-                                    <input type="text" class="form-control" id="src_obj" placeholder="Source Object">
+                                <div class="form-group col-md-1">
+                                    obj:
                                 </div>
-                                <div class="form-group col-md-6">
-                                    <input type="text" class="form-control" id="dst_obj" placeholder="Destination Object">
+                                <div class="form-group col-md-5">
+                                    <input type="text" class="form-control" id="src_obj" placeholder="Object">
                                 </div>
-                            </div>
-
-                            <div class="form-row">
-                                <div class="form-group col-md-6">
-                                    <input type="text" class="form-control" id="src_sty" placeholder="Source Style">
+                                <div class="form-group col-md-1">
+                                    with:
                                 </div>
-                                <div class="form-group col-md-6">
-                                    <input type="text" class="form-control" id="dst_sty" placeholder="Destination Style">
+                                <div class="form-group col-md-5">
+                                    <input type="text" class="form-control" id="dst_obj" placeholder="Object">
                                 </div>
                             </div>
 
                             <div class="form-row">
-                                <div class="form-group col-md-6">
-                                    <input type="text" class="form-control" id="src_act" placeholder="Source Action">
+                                <div class="form-group col-md-1">
+                                    act:
                                 </div>
-                                <div class="form-group col-md-6">
-                                    <input type="text" class="form-control" id="dst_act" placeholder="Destination Action">
+                                <div class="form-group col-md-5">
+                                    <input type="text" class="form-control" id="src_act" placeholder="Action">
+                                </div>
+                                <div class="form-group col-md-1">
+                                    with
+                                </div>
+                                <div class="form-group col-md-5">
+                                    <input type="text" class="form-control" id="dst_act" placeholder="Action">
                                 </div>
                             </div>
 
-                            <div class="container slider-container">
-                              <label>Scale:</label>
-                              <input type="range" class="custom-range" id="slider" min="0" max="100" step="1" value="100">
-                              <!--<div class="progress mt-3">
-                                <div id="progressBar" class="progress-bar" role="progressbar" style="width: 0%;" aria-valuenow="0" aria-valuemin="0" aria-valuemax="100"></div>
-                              </div>-->
+                            <div class="form-row">
+                                <div class="form-group col-md-1">
+                                    sty:
+                                </div>
+                                <div class="form-group col-md-5">
+                                    <input type="text" class="form-control" id="src_sty" placeholder="Style">
+                                </div>
+                                <div class="form-group col-md-1">
+                                    with
+                                </div>
+                                <div class="form-group col-md-5">
+                                    <input type="text" class="
+                                    form-control" id="dst_sty" placeholder="Style">
+                                </div>
                             </div>
 
 
+                            <div class="form-row">
+                                <div class="form-group col-md-6">
+                                    <select class="form-control" id="purpose">
+                                        <option value="likeness infringement">Likeness Infringement</option>
+                                        <option value="piracy">Piracy</option>
+                                        <option value="Horrorible content ">Horrorible content </option>
+                                        <option value="piracy">Abuse behavior</option>
+                                        <option value="piracy">Bloody content</option>
+                                        <option value="piracy">Violent behavior</option>
+                                        <option value="piracy">Sexual content</option>
+                                        <option value="piracy">Self-harm</option>
+                                        <option value="piracy">Illegal activities</option>
+                                        <option value="piracy">Terrorism</option>
+                                        <option value="piracy">Children sexual content</option>
+                                        <option value="piracy">Unlimited jokes</option>
+                                        <option value="piracy">Insulting beliefs</option>
+                                        <option value="piracy">Disinformation</option>
+                                    </select>
+                                </div>
+                                <div class="form-group col-md-6">
+                                    <button class="btn btn-light btn-block" onclick="generatePolicy()" style="background-color:#FFB6C1">Save Policy</button>
+                                </div>
+                            </div>
 
                             <div class="form-row">
                                 <div class="form-group col-md-6">
@@ -148,17 +295,7 @@
                                     </select>
                                 </div>
                             </div>
-
-                            <div class="form-row">
-                                <div class="form-group col-md-6">
-                                    <select class="form-control" id="purpose">
-                                        <option value="piracy">Piracy</option>
-                                    </select>
-                                </div>
-                                <div class="form-group col-md-6">
-                                    <button class="btn btn-light btn-block" onclick="generatePolicy()" style="background-color:#FFB6C1">Save Policy</button>
-                                </div>
-                            </div>
+                            
                         </div>
                     </div>
                 </div>
@@ -168,13 +305,13 @@
                         <div class="example-section">
                             <div class="row">
                                 <div class="col-md-6">
-                                    <h4>Examples Before Moderation:</h4>
+                                    <h4>Examples from the original model:</h4>
                                     <div id="before-moderation" class="example-images" style="border-radius: 10%; background-color: #F5F5F5; height: 500px;">
                                         <!-- Images will be displayed here -->
                                     </div>
                                 </div>
                                 <div class="col-md-6">
-                                    <h4>Examples After Moderation:</h4>
+                                    <h4>Examples from the moderated model:</h4>
                                     <div id="after-moderation" class="example-images" style="border-radius: 10%; background-color: #F5F5F5; height: 500px;">
                                         <!-- Images will be displayed here -->
                                     </div>
@@ -209,20 +346,19 @@
         }
 
         function generatePolicy() {
-            alert("Start to generate. Please wait until the alert comes again.");
             const generatePolicyButton = document.getElementById('generate-policy-button');
             const policy_dict = {
                 src_content: {
                     obj: document.getElementById('src_obj').value,
                     sty: document.getElementById('src_sty').value,
                     act: document.getElementById('src_act').value,
-                    scale: document.getElementById('slider').value
+                    scale: "90"//document.getElementById('slider').value
                 },
                 dst_content: {
                     obj: document.getElementById('dst_obj').value,
                     sty: document.getElementById('dst_sty').value,
                     act: document.getElementById('dst_act').value,
-                    scale: document.getElementById('slider').value
+                    scale: "90"//document.getElementById('slider').value
                 },
                 method: document.getElementById('method').value,
                 purpose: document.getElementById('purpose').value,
@@ -238,17 +374,23 @@
                 },
                 body: JSON.stringify({ "policy_name": policy_name, "policy_dict": policy_dict })
             })
-                .then(response => response.json())
+                .then(
+                    response => response.json(), 
+                    //location.reload()
+                    //generateImage()
+                )
                 .then(data => {
-                    alert('Policy Moderation Complete');
+                    loadPolicies()
+                    //alert('Policy Moderation Complete');
                 })
                 .catch(error => {
                     console.error('Error:', error);
-                });
+                })
         }
 
+        var moderate_global_status=false
+
         function generateImage() {
-            alert("Start to generate. Please wait until the alert comes again.");
             var policy_name = document.getElementById('policy_name').value;
             const prompt = document.getElementById('example-prompt').value;
 
@@ -264,7 +406,7 @@
                 .then(response => response.json())
                 .then(data => {
                     const beforeModerationContainer = document.getElementById('before-moderation');
-                    beforeModerationContainer.innerHTML = '';
+
                 
                     let beforeModerationHTML = '<div style="display: grid; grid-template-columns: repeat(3, 1fr); gap: 10px;">';
                     
@@ -282,22 +424,24 @@
                         headers: {
                             'Content-Type': 'application/json'
                         },
-                        body: JSON.stringify({ policy_name: policy_name, prompt: prompt })
+                        body: JSON.stringify({ prompt: prompt, policy_name: policy_name})
                     })
                         .then(response => response.json())
                         .then(data => {
-                            const afterModerationContainer = document.getElementById('after-moderation');
-                            afterModerationContainer.innerHTML = '';
-                            alert("Generation complete");
-                            let afterModerationHTML = '<div style="display: grid; grid-template-columns: repeat(3, 1fr); gap: 10px;">';
-                            data.forEach(imagePath => {
-                                afterModerationHTML += `<img src="${imagePath}" style="width: 100%;">`;
-                            });
-                            afterModerationHTML += '</div>';
-                            afterModerationContainer.innerHTML = afterModerationHTML;
+                            if(moderate_global_status){
+                                const afterModerationContainer = document.getElementById('after-moderation');
+                                afterModerationContainer.innerHTML = '';
+                                let afterModerationHTML = '<div style="display: grid; grid-template-columns: repeat(3, 1fr); gap: 10px;">';
+                                data.forEach(imagePath => {
+                                    afterModerationHTML += `<img src="${imagePath}" style="width: 100%;">`;
+                                });
+                                afterModerationHTML += '</div>';
+                                afterModerationContainer.innerHTML = afterModerationHTML;
+                            }else{
+                                moderate_global_status=true;
+                            }
                         });
                 }).catch(error => {
-                    alert("Generation failed");
                     console.error('Error:', error);
                 });
         }
@@ -307,15 +451,17 @@
                 .then(response => response.json())
                 .then(data => {
                     const policyList = document.getElementById('policy-list');
+                    policyList.innerHTML = '';
+                    //policyList.removeChild(),
                     data.forEach(policyName => {
                         const policyItem = document.createElement('div');
                         policyItem.style.color = 'black';
                         policyItem.className = 'form-check';
                         policyItem.innerHTML = `
                             <input type="checkbox" class="form-check-input"> ${policyName}
-                            <div class="btn-group" role="group" style="color:black">
-                                <button class="btn btn-sm btn-light" onclick="editPolicy('${policyName}')">Edit</button>
-                                <button class="btn btn-sm btn-light" onclick="deletePolicy('${policyName}')">Delete</button>
+                            <div class="btn-group" role="group">
+                                <button class="btn btn-sm btn-success" onclick="editPolicy('${policyName}')">Edit</button>
+                                <button class="btn btn-sm btn-danger" onclick="deletePolicy('${policyName}')">Delete</button>
                             </div>
                         `;
                         policyList.appendChild(policyItem);

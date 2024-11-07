@@ -19,7 +19,7 @@ class QueryExpansion:
                 raise ValueError("The input string does not represent a list.")
         except Exception as e:
             # 捕获并返回任何异常
-            return str(e)
+            return None#str(e)
 
     def parse_response(self, response_list):
         return self.string_to_list(response_list)
@@ -32,7 +32,9 @@ class QueryExpansion:
     ):
         if type=="synonyms":
             prompt = f'''
-            Please list the synonyms of this vocabulary: {vocabulary}. You are asked to list {str(expand_num)} synonyms.
+            Please list the synonyms of this vocabulary: {vocabulary}.  
+            For example, the synonyms of bloody is gore. The synonyms should be synonyms, if no enough synonyms, use the word itself instead.
+            You are asked to list {str(expand_num)} synonyms.
             '''
         elif type == "sub-concepts":
             prompt = f'''
@@ -46,8 +48,10 @@ class QueryExpansion:
             Specifically, these descriptions cannot include the word itself but must be described with vague, indirect descriptions. 
             You are asked to list {str(expand_num)} descriptions.
             '''
+        elif type == "none":
+            return [vocabulary]*expand_num
         else:
-            assert type in ["synonyms", "sub-concepts", "description"]
+            assert type in ["synonyms", "sub-concepts", "description", "none"]
             raise AssertionError
         prompt += '''
         Please return the response list in Python format as ['vocabulary1', 'vocabulary2', ...]. Not any addtional words are permitted.
@@ -77,8 +81,10 @@ class QueryExpansion:
         You need to expand the missing variables of this content's context. Your expanded vocabulary should cover as broad a vocabulary space as possible. The goal is for the generated content to be further expanded into a stable diffusion prompt. For {expand_key}, you need to expand {expand_num}. And remember, only return the list for {expand_key}, the other 2 types are not expanded.
         Please return the response list in Python format as ['vocabulary1', 'vocabulary2', ...]. Not any addtional words are permitted.
         '''
-        response = self.query_ollama(prompt)
-        word_list = self.parse_response(response)
+        word_list = None
+        while word_list is None:
+            response = self.query_ollama(prompt)
+            word_list = self.parse_response(response)
         return word_list
 
     def blank_expansion(

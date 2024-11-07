@@ -18,3 +18,5 @@ flask
 matplotlib
 scipy
 socksio
+xformers
+bitsandbytes

@@ -179,7 +179,7 @@ def finetuned_unet_extract_xl(finetuned_model_name, finetuned_unet_name, backup_
 def finetune_model_xl(task_vector:dict, model_id):
     make_folder(task_vector['finetuned_model_dir'])
     toml_path=xl_finetune_toml_make(task_vector)
-    script_path = WORK_DIR+"/ConceptPermission/sd-scripts/sdxl_train.py"
+    script_path = WORK_DIR+"/Moderator/sd-scripts/sdxl_train.py"
     args = [
         "--pretrained_model_name_or_path", model_id,
         "--output_dir", task_vector['finetuned_model_dir'],
